@@ -1,0 +1,81 @@
+ActsAsSecureUrl
+===============
+
+ActsAsSecureUrl provides self-authentication for your Rails models from
+URL parameters.
+
+
+Basic Setup
+===========
+
+Include the plugin somewhere in your application:
+
+  include SecureUrl
+
+and in your models, declare:
+
+  acts_as_secure_url
+  
+Models gain a #authenticate method that takes an id and public_key,
+and returns your object if authentication is successful.
+
+Set some site key constants somewhere:
+
+  SecureUrl::SITE_KEY = "some-long-secure-string"
+  SecureUrl::HASH_ITERATIONS = 3
+  
+Both of these values should be persisted across your deployment,
+and kept safe. If either of these values change, all of your
+old database rows will be inaccessible.
+
+Generators
+==========
+
+  script/generate acts_as_secure_url [options] Model Controller
+  
+Generates a basic model and controller for your secure class, plus
+a named route for secure URLs.
+
+Suported options:
+
+  --skip-migration          Skips the migration file, be sure to
+                            include access_key and salt fields
+                            in your database table
+                            
+                            
+  --persist-public-key      Adds a public_key column to the database
+                            migration. This makes setup easy, but
+                            degrades security; if your database is 
+                            ever compromised, it can be used to 
+                            recreate public URLs.
+                            
+                            
+Security
+========
+
+ActsAsSecureUrl generates a secret access_key value for each resource
+based on a SHA1 hash of a provided public_key and a pre-configured 
+site key. 
+
+ActsAsSecureUrl uses a public key provided by the user in URL parameters
+to authenticate a resource by id. This is secure only as far as the 
+public_key parameter is secure, so links such as
+
+http://hostname.com/:public_key/:id
+
+while difficult to guess, can persist in caches and logs and be reused. 
+It is probably safer to post the public_key parameter through SSL/TLS.
+Additional layers of security, such as link expiry, limited link usages, 
+and location requirements are strongly urged. It's also suggested 
+that you use complex, unique, non-deterministic primary keys to reduce
+the effectiveness of brute-force attacks.
+
+The #public_key_data method, which is a random SHA1 hash by default, can 
+be overridden by user-verifiable data, making client-side public key 
+calculations or user-provided keys possible.
+
+To maximize security, ensure that your database and site key parameters
+are secured separately. 
+
+
+Copyright (c) 2009 [Scott Burton], all rights reserved

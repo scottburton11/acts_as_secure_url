@@ -1,0 +1,20 @@
+Generators
+==========
+
+  script/generate acts_as_secure_url [options] Model Controller
+  
+Generates a basic model and controller for your secure class, plus
+a migration file and a named route for secure URLs.
+
+Suported options:
+
+  --skip-migration          Skips the migration file, be sure to
+                            include an access_key and salt in your
+                            database table
+                            
+  --persist-public-key      Adds a public_key column to the database
+                            migration. This makes setup easy, but
+                            degrades security; if your database is 
+                            ever compromised, it can be used to 
+                            recreate public URLs.
+                            
